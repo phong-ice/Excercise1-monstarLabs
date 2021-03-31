@@ -27,7 +27,7 @@ class AdapterStudents(
 ) :
     RecyclerView.Adapter<AdapterStudents.ViewHolder>(), Filterable {
 
-    lateinit var education:String
+    lateinit var education: String
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         var tv_name_student = view.tv_name_student
@@ -46,7 +46,6 @@ class AdapterStudents(
     }
 
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.tv_name_student.text = students[position].name
         holder.tv_number_phone.text = (students[position].numberPhone).toString()
@@ -55,57 +54,63 @@ class AdapterStudents(
         holder.itemView.setOnClickListener {
 
             var dialogBuilder = AlertDialog.Builder(context)
-            var view = LayoutInflater.from(context).inflate(R.layout.layout_dialog,null,false)
+            var view = LayoutInflater.from(context).inflate(R.layout.layout_dialog, null, false)
             dialogBuilder.setView(view)
-            dialogBuilder.setNegativeButton("Delete",DialogInterface.OnClickListener { dialog, which ->
-                students.removeAt(position)
-                studentsBackup.removeAt(position)
-                notifyDataSetChanged()
-            })
-            dialogBuilder.setPositiveButton("Update",DialogInterface.OnClickListener { dialog, which ->
+            dialogBuilder.setNegativeButton(
+                "Delete",
+                DialogInterface.OnClickListener { dialog, which ->
+                    students.removeAt(position)
+                    studentsBackup.removeAt(position)
+                    notifyDataSetChanged()
+                })
+            dialogBuilder.setPositiveButton(
+                "Update",
+                DialogInterface.OnClickListener { dialog, which ->
 
-                var name = view.edt_name_student_dialog.text.toString()
-                var yearOfBirth = (view.edt_year_of_birth_dialog.text).toString()
-                var numberPhone = (view.edt_sdt_dialog.text).toString()
-                var nameSchool = view.edt_name_school_dialog.text.toString()
-                var major = view.edt_major_dialog.text.toString()
+                    var name = view.edt_name_student_dialog.text.toString()
+                    var yearOfBirth = (view.edt_year_of_birth_dialog.text).toString()
+                    var numberPhone = (view.edt_sdt_dialog.text).toString()
+                    var nameSchool = view.edt_name_school_dialog.text.toString()
+                    var major = view.edt_major_dialog.text.toString()
 
-                when {
-                    name.equals("") -> {
-                        view.edt_name_student_dialog.error = "Require enter name"
+                    when {
+                        name.equals("") -> {
+                            view.edt_name_student_dialog.error = "Require enter name"
+                        }
+                        yearOfBirth.equals("") -> {
+                            view.edt_year_of_birth_dialog.error = "Require enter year of birth"
+                        }
+                        numberPhone.equals("") -> {
+                            view.edt_sdt_dialog.error = "Require enter number phone"
+                        }
+                        nameSchool.equals("") -> {
+                            view.edt_name_school_dialog.error = "Require enter school's name"
+                        }
+                        major.equals("") -> {
+                            view.edt_major_dialog.error = "Require enter major"
+                        }
+                        else -> {
+                            var student = Student(
+                                name,
+                                yearOfBirth.toInt(),
+                                numberPhone.toInt(),
+                                education,
+                                nameSchool,
+                                major
+                            )
+                            students.removeAt(position)
+                            studentsBackup.removeAt(position)
+                            studentsBackup.add(position, student)
+                            students.add(position, student)
+                            notifyDataSetChanged()
+                        }
                     }
-                    yearOfBirth.equals("") -> {
-                        view.edt_year_of_birth_dialog.error = "Require enter year of birth"
-                    }
-                    numberPhone.equals("") -> {
-                        view.edt_sdt_dialog.error = "Require enter number phone"
-                    }
-                    nameSchool.equals("") -> {
-                        view.edt_name_school_dialog.error = "Require enter school's name"
-                    }
-                    major.equals("") -> {
-                        view.edt_major_dialog.error = "Require enter major"
-                    }
-                    else -> {
-                        var student = Student(
-                            name,
-                            yearOfBirth.toInt(),
-                            numberPhone.toInt(),
-                            education,
-                            nameSchool,
-                            major
-                        )
-                        students.removeAt(position)
-                        studentsBackup.removeAt(position)
-                        studentsBackup.add(position,student)
-                        students.add(position,student)
-                        notifyDataSetChanged()
-                    }
-          }
-            })
-            dialogBuilder.setNeutralButton("Cancel",DialogInterface.OnClickListener { dialog, which ->
-                dialog.dismiss()
-            })
+                })
+            dialogBuilder.setNeutralButton(
+                "Cancel",
+                DialogInterface.OnClickListener { dialog, which ->
+                    dialog.dismiss()
+                })
             dialogBuilder.create()
             view.edt_name_student_dialog.setText(students[position].name)
             view.edt_year_of_birth_dialog.setText(students[position].yearOfBirth.toString())
@@ -119,20 +124,21 @@ class AdapterStudents(
             )
             adapterSpiner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             view.sp_education_dialog.adapter = adapterSpiner
-            view.sp_education_dialog.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
-                override fun onNothingSelected(parent: AdapterView<*>?) {
-                }
+            view.sp_education_dialog.onItemSelectedListener =
+                object : AdapterView.OnItemSelectedListener {
+                    override fun onNothingSelected(parent: AdapterView<*>?) {
+                    }
 
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long
-                ) {
-                    education = parent!!.getItemAtPosition(position) as String
-                }
+                    override fun onItemSelected(
+                        parent: AdapterView<*>?,
+                        view: View?,
+                        position: Int,
+                        id: Long
+                    ) {
+                        education = parent!!.getItemAtPosition(position) as String
+                    }
 
-            }
+                }
             dialogBuilder.show()
 
         }
@@ -162,10 +168,11 @@ class AdapterStudents(
                 result.values = studentsBackup
             } else {
                 var commonPattern = pattern.toLowerCase().trim()
-                for (student in students) {
+                for (student in studentsBackup) {
                     var informationStudent: String =
-                        "${student.name} - ${student.numberPhone} - ${student.yearOfBirth} - ${student.education} - ${student.nameSchool} -${student.major}"
-
+                        "${student.name.toLowerCase()
+                            .trim()} - ${student.numberPhone} - ${student.yearOfBirth} - ${student.education} - ${student.nameSchool.toLowerCase().trim()} -${student.major.toLowerCase().trim()}"
+                    Log.e("phongice123", commonPattern)
                     if (informationStudent.contains(commonPattern)) {
                         studentsFiltered.add(student)
                     }

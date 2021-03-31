@@ -20,12 +20,12 @@ import kotlinx.android.synthetic.main.activity_main.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-class MainActivity : AppCompatActivity(){
+class MainActivity : AppCompatActivity() {
 
     lateinit var students: MutableList<Student>
     lateinit var studentsBackup: MutableList<Student>
     lateinit var adapterStudents: AdapterStudents
-    lateinit var education:String
+    lateinit var education: String
 
     companion object {
         const val UNIVERSITY = "University"
@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity(){
         )
         adapterSpiner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         sp_education.adapter = adapterSpiner
-        sp_education.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+        sp_education.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
 
@@ -112,7 +112,7 @@ class MainActivity : AppCompatActivity(){
                         major
                     )
                     students.add(0, student)
-                    studentsBackup.add(0,student)
+                    studentsBackup.add(0, student)
                     adapterStudents.notifyDataSetChanged()
 
                     edt_name_student.setText("")
@@ -156,7 +156,7 @@ class MainActivity : AppCompatActivity(){
         }
     }
 
-    public fun updateStudens(){
+    public fun updateStudens() {
         Toast.makeText(this, "hello my name is Phong", Toast.LENGTH_SHORT).show()
     }
 
