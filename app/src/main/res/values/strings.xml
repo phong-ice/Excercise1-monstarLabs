@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">HomeWork1-MonstarLabs</string>
+    <string name="college">College</string>
+    <string name="university">University</string>
+    <string-array name="education">
+        <item>University</item>
+        <item>College</item>
+    </string-array>
+</resources>

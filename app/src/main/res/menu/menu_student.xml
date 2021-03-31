@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/item_show_all"
+        android:title="All"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/item_university"
+        android:title="University"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/item_college"
+        android:title="College"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/item_search"
+        android:icon="@drawable/ic_baseline_search_24"
+        android:title="Search"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="always" />
+
+    <item
+        android:icon="@drawable/ic_baseline_sort_24"
+        android:title="Sort"
+        app:showAsAction="ifRoom">
+        <menu>
+            <item
+                android:id="@+id/item_sortByName"
+                android:title="Sort by name" />
+            <item
+                android:id="@+id/item_sortByYearOfBirth"
+                android:title="Sort by year of birth" />
+
+            <item
+                android:id="@+id/item_sortByNumberPhone"
+                android:title="Sort by number phone" />
+        </menu>
+    </item>
+
+
+</menu>
