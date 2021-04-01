@@ -73,6 +73,7 @@ class MainActivity : AppCompatActivity(), CallbackAdapterStudents {
 
         btn_delete_sutdent.setOnClickListener {
             students.removeAt(position!!)
+            studentsBackup.removeAt(position!!)
             hideButtonEditor(it)
             adapterStudents.notifyDataSetChanged()
         }
