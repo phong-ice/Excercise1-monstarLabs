@@ -1,5 +1,7 @@
 package com.example.homework1_monstarlabs
 
+import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.media.MediaCodec
@@ -20,20 +22,19 @@ import kotlinx.android.synthetic.main.activity_main.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), CallbackAdapterStudents {
 
     lateinit var students: MutableList<Student>
     lateinit var studentsBackup: MutableList<Student>
     lateinit var adapterStudents: AdapterStudents
     lateinit var education: String
+    var position: Int? = null
+    var isLayoutInput:Boolean = false
 
     companion object {
         const val UNIVERSITY = "University"
         const val COLLEGE = "College"
         const val ALL = "All"
-        const val SORT_BY_NAME = "sortByName"
-        const val SORT_BY_NUMBER_PHONE = "sortByNumberPhone"
-        const val SORT_BY_YEAR_OF_BIRTH = "sortByYearOfBirth"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,7 +43,7 @@ class MainActivity : AppCompatActivity() {
 
         students = mutableListOf()
         studentsBackup = mutableListOf()
-        adapterStudents = AdapterStudents(this, students, studentsBackup)
+        adapterStudents = AdapterStudents(students, studentsBackup, this)
         lv_students.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = adapterStudents
@@ -68,6 +69,86 @@ class MainActivity : AppCompatActivity() {
                 education = parent!!.getItemAtPosition(position) as String
             }
 
+        }
+
+        btn_delete_sutdent.setOnClickListener {
+            students.removeAt(position!!)
+            hideButtonEditor(it)
+            adapterStudents.notifyDataSetChanged()
+        }
+        btn_cancel.setOnClickListener {
+            hideButtonEditor(it)
+        }
+        btn_update_student.setOnClickListener {
+            var name = edt_name_student.text.toString()
+            var yearOfBirth = (edt_year_of_birth.text).toString()
+            var numberPhone = (edt_sdt.text).toString()
+            var nameSchool = edt_name_school.text.toString()
+            var major = edt_major.text.toString()
+            var oldNumberPhone = students[position!!].numberPhone
+            when {
+                name.equals("") -> {
+                    edt_name_student.setError("Require enter name")
+                }
+                yearOfBirth.equals("") -> {
+                    edt_year_of_birth.setError("Require enter year of birth")
+                }
+                numberPhone.equals("") -> {
+                    edt_sdt.setError("Require enter number phone")
+                }
+                nameSchool.equals("") -> {
+                    edt_name_school.setError("Require enter school's name")
+                }
+                major.equals("") -> {
+                    edt_major.setError("Require enter major")
+                }
+                else -> {
+                    if (numberPhone.toInt() == oldNumberPhone) {
+                        students.removeAt(position!!)
+                        studentsBackup.removeAt(position!!)
+                        var student = Student(
+                            name,
+                            yearOfBirth.toInt(),
+                            numberPhone.toInt(),
+                            education,
+                            nameSchool,
+                            major
+                        )
+                        students.add(position!!, student)
+                        studentsBackup.add(position!!, student)
+                        hideButtonEditor(it)
+                        adapterStudents.notifyDataSetChanged()
+                    } else {
+                        var isNumberPhoneAvailable: Boolean = false
+                        for (student in students) {
+                            if (numberPhone == student.numberPhone.toString()) {
+                                edt_sdt.error = "This number phone available"
+                                isNumberPhoneAvailable = true
+                                break
+                            }
+                        }
+                        if (!isNumberPhoneAvailable) {
+                            students.removeAt(position!!)
+                            studentsBackup.removeAt(position!!)
+                            var student = Student(
+                                name,
+                                yearOfBirth.toInt(),
+                                numberPhone.toInt(),
+                                education,
+                                nameSchool,
+                                major
+                            )
+                            students.add(position!!, student)
+                            studentsBackup.add(position!!, student)
+                            adapterStudents.notifyDataSetChanged()
+                            hideButtonEditor(it)
+                        }
+                    }
+                }
+            }
+        }
+        btn_show_input.setOnClickListener {
+            showOrHideLayoutInput()
         }
     }
 
@@ -156,9 +237,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    public fun updateStudens() {
-        Toast.makeText(this, "hello my name is Phong", Toast.LENGTH_SHORT).show()
-    }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         var menuInflater = menuInflater
@@ -208,18 +286,53 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    //    fun EditText.validateYearOfBirth(): Boolean {
-//        var year = this.text.toString().toInt()
-//        var data = Date()
-//        var simpleFormatDate = SimpleDateFormat("yyyy")
-//        var yearNovv = simpleFormatDate.format(data)
-//        var yearNow: Int = yearNovv.toInt()
-//        return text.length > 4 && year > yearNow
-//    }
     fun Context.hideKeyboard(view: View) {
         val inputMethodManager =
             getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+
+    override fun onItemClick(pos: Int) {
+        position = pos
+        edt_name_school.setText(students[pos].nameSchool)
+        edt_year_of_birth.setText(students[pos].yearOfBirth.toString())
+        edt_name_student.setText(students[pos].name)
+        edt_major.setText(students[pos].major)
+        edt_sdt.setText(students[pos].numberPhone.toString())
+
+        btn_update_student.visibility = View.VISIBLE
+        btn_delete_sutdent.visibility = View.VISIBLE
+        btn_cancel.visibility = View.VISIBLE
+        btn_add_student.visibility = View.GONE
+        showOrHideLayoutInput()
+    }
+    private fun hideButtonEditor(view:View){
+        btn_update_student.visibility = View.GONE
+        btn_delete_sutdent.visibility = View.GONE
+        btn_cancel.visibility = View.GONE
+        btn_add_student.visibility = View.VISIBLE
+        edt_name_student.setText("")
+        edt_year_of_birth.setText("")
+        edt_sdt.setText("")
+        edt_name_school.setText("")
+        edt_major.setText("")
+        this.hideKeyboard(view)
+    }
+    private fun showOrHideLayoutInput(){
+        if (!isLayoutInput){
+            layout_input.visibility = View.VISIBLE
+            lv_students.visibility = View.GONE
+            val animBtnShowOrHide = ObjectAnimator.ofFloat(btn_show_input,View.ROTATION,0f,-45f)
+            animBtnShowOrHide.duration = 1000
+            animBtnShowOrHide.start()
+        }else{
+            layout_input.visibility = View.GONE
+            lv_students.visibility = View.VISIBLE
+            val animBtnShowOrHide = ObjectAnimator.ofFloat(btn_show_input,View.ROTATION,-45f,0f)
+            animBtnShowOrHide.duration = 1000
+            animBtnShowOrHide.start()
+        }
+        isLayoutInput = !isLayoutInput
     }
 }
 
